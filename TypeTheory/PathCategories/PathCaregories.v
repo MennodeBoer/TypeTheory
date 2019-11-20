@@ -1,4 +1,4 @@
-Require Export UniMath.CategoryTheory.PathCategories.Auxiliary.
+Require Export TypeTheory.PathCategories.Auxiliary.
 
 Local Open Scope cat.
 Declare Scope pathcat.
