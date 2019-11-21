@@ -29,6 +29,19 @@ End Sections.
  
 Section BinProducts_Pullbacks.
 
+  Definition binproduct_from_pullback_over_terminal {C : precategory} {T : Terminal C} {A B : C} (P : Pullback (TerminalArrow T A) (TerminalArrow T B)) : BinProduct C A B.
+  Proof.
+    use make_BinProduct.
+    - exact P.
+    - exact (PullbackPr1 P).
+    - exact (PullbackPr2 P).
+    - unfold isBinProduct.
+      intros.
+      apply P.
+      rewrite TerminalArrowUnique.
+      apply TerminalArrowUnique.
+  Defined.
+
   Coercion BinProductObject : BinProduct >-> ob.
   
   Definition pullback_of_product_gives_product {C : category} {X Y Z : C} (prod : BinProduct C Y Z) (f : X --> Y) (P : Pullback f (BinProductPr1 C prod)) : BinProduct C X Z.
@@ -71,18 +84,6 @@ Section BinProducts_Pullbacks.
           apply (homset_property C).
   Defined.
   
-  Definition binproduct_from_pullback_over_terminal {C : precategory} {T : Terminal C} {A B : C} (P : Pullback (TerminalArrow T A) (TerminalArrow T B)) : BinProduct C A B.
-  Proof.
-    use make_BinProduct.
-    - exact P.
-    - exact (PullbackPr1 P).
-    - exact (PullbackPr2 P).
-    - unfold isBinProduct.
-      intros.
-      apply P.
-      rewrite TerminalArrowUnique.
-      apply TerminalArrowUnique.
-  Defined.
 
 End BinProducts_Pullbacks.
 
