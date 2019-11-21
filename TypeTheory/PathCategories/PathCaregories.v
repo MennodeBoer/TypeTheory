@@ -1,4 +1,4 @@
-Require Export TypeTheory.PathCategories.Auxiliary.
+Require Export UniMath.CategoryTheory.PathCategories.Auxiliary.
 
 Local Open Scope cat.
 Declare Scope pathcat.
@@ -197,6 +197,8 @@ Definition make_is_prepathcategory_compact (C : category_equivs_fibs)
   (pullbacks : ∏ (A B I : C) (f : A --> I) (p : B -|> I) , ∑ P : Pullback f p, is_fibration (PullbackPr1 P) × (is_equivalence p → is_equivalence (PullbackPr1 P)))
   (sections : ∏ (A B : C) (f : A ~|> B) , ∑ s : B --> A , is_section f s) : is_prepathcategory_compact C := (terminal,,pullbacks,,sections).
 
+
+
 Definition is_prepathcategory_from_compact {C : category_equivs_fibs} (H : is_prepathcategory_compact C) : is_prepathcategory C.
 Proof.
   destruct H as [terminal [pullbacks sections]].
@@ -363,24 +365,25 @@ Definition binproduct_pr1_fibration {C : prepathcategory} {A B : C} (P : BinProd
 Definition binproduct_pr2_fibration {C : prepathcategory} {A B : C} (P : BinProduct C A B) : P -|> B := make_fibration (BinProductPr2 C P) (any_binproduct_pr2_is_fib P).
 
 Section PathObjects.
-  Context (C : precategory_equivs_fibs_data).
-  Hypotheses H :  (∏ A : C , Product bool C (λ _ , A)).
-  Hypotheses has_H : (∏ A : C , ∥ Product bool C (λ _ , A) ∥).
-
+  Context (C : prepathcategory).
+ 
   Definition pathobject_data (A : C) :=
-    ∑ PA , (A --> PA) × (PA --> self_product C H A).
+    ∑ PA , (A --> PA) × (PA --> binproduct A A).
 
-  Definition make_pathobject_data (A : C) (PA : C) (r : A --> PA) (st : PA --> self_product C H A) : pathobject_data A := tpair _ PA (r,,st).
+  Definition make_pathobject_data {A : C}
+             (PA : C)
+             (r : A --> PA)
+             (st : PA --> binproduct A A) : pathobject_data A := tpair _ PA (r,,st).
   Definition object_from_pathobject_data {A : C} (PA : pathobject_data A) := pr1 PA.
   Coercion object_from_pathobject_data : pathobject_data >-> ob.
 
   Definition rmap {A : C} (PA : pathobject_data A) : A --> PA := pr1 (pr2 PA).
-  Definition stmap {A : C} (PA : pathobject_data A): PA --> self_product C H A := pr2 (pr2 PA).
-  Definition smap {A : C} (PA : pathobject_data A) : PA --> A := ProductPr bool C (H A) true ∘ pr2 (pr2 PA).
-  Definition tmap {A : C} (PA : pathobject_data A) : PA --> A := ProductPr bool C (H A) false ∘ pr2 (pr2 PA).
-
+  Definition stmap {A : C} (PA : pathobject_data A): PA --> binproduct A A := pr2 (pr2 PA).
+  Definition smap {A : C} (PA : pathobject_data A) : PA --> A := BinProductPr1 _ (binproduct A A) ∘ stmap PA.
+  Definition tmap {A : C} (PA : pathobject_data A) : PA --> A := BinProductPr2 _ (binproduct A A) ∘ stmap PA.
+  Check diagonal.
   Definition is_pathobject (A : C) (PA : pathobject_data A) :=
-    (equivalences A PA (rmap PA)) × (fibrations PA (self_product C H A) (stmap PA)) × ((stmap PA) ∘ (rmap PA) = diagonal C H A).
+    (is_equivalence (rmap PA)) × (is_fibration (stmap PA)) × ((stmap PA) ∘ (rmap PA) = diagonal (binproduct A A)).
 
   Lemma isaprop_is_pathobject (A : C) (PA : pathobject_data A) (hs : has_homsets C) : isaprop (is_pathobject A PA).
   Proof.
@@ -399,8 +402,11 @@ Section PathObjects.
   Definition pathobject_data_from_pathobject {A : C} (PA : pathobject A) := pr1 PA.
   Coercion pathobject_data_from_pathobject : pathobject >-> pathobject_data.
 
-  Definition is_equivelance_rmap (A : C) (PA : pathobject A) : equivalences A PA (rmap PA) := pr1 (pr2 PA).
-  Definition is_fibration_stmap (A : C) (PA : pathobject A) : fibrations PA (self_product C H A) (stmap PA) := pr1 (pr2 (pr2 PA)).
-  Definition factor_diagonal (A : C) (PA : pathobject A) := pr2 (pr2 (pr2 PA)).
+  Definition is_equivalence_rmap {A : C} (PA : pathobject A) : is_equivalence (rmap PA) := pr1 (pr2 PA).
+  Definition is_fibration_stmap {A : C} (PA : pathobject A) : is_fibration (stmap PA) := pr1 (pr2 (pr2 PA)).
+  Definition factor_diagonal {A : C} (PA : pathobject A) := pr2 (pr2 (pr2 PA)).
+
+  Definition rmap_equiv {A : C} (PA : pathobject A) : A ~~> PA := make_equivalence (rmap PA) (is_equivalence_rmap PA).
+  Definition stmap_fib {A : C} (PA : pathobject A) : PA -|> binproduct A A := make_fibration (stmap PA) (is_fibration_stmap PA).
 
 End PathObjects.

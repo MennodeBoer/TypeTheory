@@ -87,14 +87,9 @@ Section BinProducts_Pullbacks.
 End BinProducts_Pullbacks.
 
 Section Diagonal.
-  Context (C : precategory).
-  Hypotheses H :  (∏ A : C , BinProduct C A A).
-  Hypotheses has_H : (∏ A : C , ∥ BinProduct C A A ∥).
+  Context  {C : precategory}.
 
-  Definition self_product (A : C) : C := BinProductObject C (H A).
-  Definition has_self_product (A : C) : ∥ C ∥ := (hinhfun (λ P , pr1 (pr1 P)) (has_H A)).
-
-  Definition diagonal (A : C) : A --> self_product A := BinProductArrow C (H A) (identity A) (identity A).
-  Definition has_diagonal (A : C) := hinhfun (λ P : C , pr2 C) (has_self_product A).
-
+  
+  Definition diagonal {C : precategory} {A : C} (P : BinProduct C A A) : A --> P := BinProductArrow C P (identity A) (identity A).
+  
 End Diagonal.
