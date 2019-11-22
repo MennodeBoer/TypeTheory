@@ -29,21 +29,38 @@ End Sections.
  
 Section BinProducts_Pullbacks.
 
-  Definition binproduct_from_pullback_over_terminal {C : precategory} {T : Terminal C} {A B : C} (P : Pullback (TerminalArrow T A) (TerminalArrow T B)) : BinProduct C A B.
+  Coercion BinProductObject : BinProduct >-> ob.
+
+  Lemma binproductiso {C : category} {A B : C} (P Q : BinProduct C A B) : iso P Q.
   Proof.
-    use make_BinProduct.
-    - exact P.
-    - exact (PullbackPr1 P).
-    - exact (PullbackPr2 P).
-    - unfold isBinProduct.
-      intros.
-      apply P.
-      rewrite TerminalArrowUnique.
-      apply TerminalArrowUnique.
+    pose (f := BinProductArrow C Q (BinProductPr1 _ _) (BinProductPr2 C P)).
+    pose (g := BinProductArrow C P (BinProductPr1 _ _) (BinProductPr2 C Q)).
+    use tpair.
+    - exact f.
+    - apply (is_iso_qinv _ g).
+      split.
+      + apply pathsinv0.
+        apply BinProduct_endo_is_identity.
+        * rewrite (! (assoc f g (BinProductPr1 C P))).
+          unfold g; rewrite BinProductPr1Commutes.
+          unfold f; rewrite BinProductPr1Commutes.
+          auto.
+        * rewrite (! (assoc f g (BinProductPr2 C P))).
+          unfold g; rewrite BinProductPr2Commutes.
+          unfold f; rewrite BinProductPr2Commutes.
+          auto.
+      + apply pathsinv0.
+        apply BinProduct_endo_is_identity.
+        * rewrite (! (assoc g f (BinProductPr1 C Q))).
+          unfold f; rewrite BinProductPr1Commutes.
+          unfold g; rewrite BinProductPr1Commutes.
+          auto.
+        * rewrite (! (assoc g f (BinProductPr2 C Q))).
+          unfold f; rewrite BinProductPr2Commutes.
+          unfold g; rewrite BinProductPr2Commutes.
+          auto.
   Defined.
 
-  Coercion BinProductObject : BinProduct >-> ob.
-  
   Definition pullback_of_product_gives_product {C : category} {X Y Z : C} (prod : BinProduct C Y Z) (f : X --> Y) (P : Pullback f (BinProductPr1 C prod)) : BinProduct C X Z.
   Proof.
     use make_BinProduct.
@@ -83,14 +100,25 @@ Section BinProducts_Pullbacks.
           apply (homset_property C).
           apply (homset_property C).
   Defined.
-  
+
+  (*Bug? This does is not allowed as the first definition of a file?*)
+  Definition binproduct_from_pullback_over_terminal {C : precategory} {T : Terminal C} {A B : C} (P : Pullback (TerminalArrow T A) (TerminalArrow T B)) : BinProduct C A B.
+  Proof.
+    use make_BinProduct.
+    - exact P.
+    - exact (PullbackPr1 P).
+    - exact (PullbackPr2 P).
+    - unfold isBinProduct.
+      intros.
+      apply P.
+      rewrite TerminalArrowUnique.
+      apply TerminalArrowUnique.
+  Defined.
 
 End BinProducts_Pullbacks.
 
 Section Diagonal.
-  Context  {C : precategory}.
 
-  
   Definition diagonal {C : precategory} {A : C} (P : BinProduct C A A) : A --> P := BinProductArrow C P (identity A) (identity A).
   
 End Diagonal.
