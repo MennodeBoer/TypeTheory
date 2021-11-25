@@ -20,7 +20,7 @@ PACKAGES += Csystems
 PACKAGES += Bsystems
 PACKAGES += Cubical
 PACKAGES += Initiality
-PACKAGES += PathCategories
+PACKAGES += TypeConstructions
 ############################################
 # other user options; see also build/Makefile-configuration-template
 BUILD_COQ ?= no 
@@ -146,7 +146,7 @@ clean::
 	find TypeTheory \( -name .\*.aux -o -name \*.glob -o -name \*.v.d -o -name \*.vo \) -delete
 	find TypeTheory -type d -empty -delete
 clean::; rm -rf $(ENHANCEDDOCTARGET)
-latex-clean clean::; cd $(LATEXDIR) ; rm -f *.pdf *.tex *.log *.aux *.out *.blg *.bbl
+latex-clean clean::; rm -rf $(LATEXDIR)
 
 distclean:: clean
 distclean::          ; - $(MAKE) -C sub/coq distclean

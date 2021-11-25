@@ -38,8 +38,6 @@ Require Import TypeTheory.Auxiliary.Auxiliary.
 Require Import TypeTheory.ALV1.CwF_def.
 Require Import TypeTheory.ALV1.CwF_SplitTypeCat_Defs.
 
-Set Automatic Introduction.
-
 Section Fix_Category.
 
 Context {C : category}.
@@ -117,9 +115,10 @@ Proof.
   eapply weqcomp.
     unfold obj_ext_structure.
     apply weqtotal2asstor. simpl.
-  eapply weqcomp. Focus 2. apply weqtotal2asstol. simpl.
-  eapply weqcomp. Focus 2. eapply invweq.
-        apply weqtotal2dirprodassoc. simpl.
+  eapply weqcomp. 2: { apply weqtotal2asstol. }
+  simpl. eapply weqcomp. 
+  2: { eapply invweq, weqtotal2dirprodassoc. }
+  simpl.
   apply weqfibtototal.
   intro Ty.
   eapply weqcomp.
@@ -133,7 +132,7 @@ Defined.
 
 Definition weq_cwf'_cwf1_structure : cwf'_structure C ≃ cwf1_structure.
 Proof.
-  eapply weqcomp. Focus 2. apply weqtotal2asstor'.
+  eapply weqcomp. 2: { apply weqtotal2asstor'. }
   eapply weqcomp. apply weqtotal2asstol'.
   use weqbandf.
   - apply weq_rep1_cwf'_data.
@@ -199,8 +198,10 @@ Proof.
       (fun Γ Y => forall A, rep1_fiber_axioms A (pr2 (pr1 (Y A))) (pr2 (Y A)))).
   apply weqonsecfibers; intro Γ.
   eapply weqcomp.
-    use (@weqtotaltoforall _ _
-      (fun A ΓAπt => rep1_fiber_axioms A (pr2 (pr1 ΓAπt)) (pr2 ΓAπt))).
+  { exact (weqtotaltoforall
+           _
+           (fun A ΓAπt => @rep1_fiber_axioms pp Γ _ (pr1 (pr1 ΓAπt)) 
+                                             (pr2 (pr1 ΓAπt)) (pr2 ΓAπt))). }
   apply weqonsecfibers; intro A.
   unfold cwf_fiber_representation.
   (* reassociation:
