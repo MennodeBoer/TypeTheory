@@ -2,9 +2,7 @@
 (** This file provides a definition (and basic development) of contextual categories as split type-cats/CwA’s in which every object is uniquely expressible as an iterated extension of a chosen terminal object. *)
 
 Require Import UniMath.MoreFoundations.All.
-Local Open Scope logic. (* to read notation [∃!] as [iscontr_hProp] instead of [iscontr]. *)
 Require Import UniMath.CategoryTheory.All.
-
 Require Import TypeTheory.Auxiliary.Auxiliary.
 Require Import TypeTheory.Auxiliary.Partial.
 Require Import TypeTheory.ALV1.TypeCat.
@@ -225,7 +223,7 @@ Note that such a base object is necessarily unique: see [isaprop_is_contextual].
   := ∑ Γ0 : C,
        isTerminal C Γ0
        ×
-       ∀ Γ:C, ∃! AA : extension Γ0, ext_extension Γ0 AA = Γ.
+       ∀ Γ:C, (∃! AA : extension Γ0, (ext_extension Γ0 AA = Γ)%type)%logic.
   (** The second component could be written as
   [isweq (ext_extension Γ0)], but we spell it out for readability. *)
 

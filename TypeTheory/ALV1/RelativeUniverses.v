@@ -20,8 +20,6 @@ Require Import TypeTheory.Auxiliary.CategoryTheoryImports.
 
 Require Import TypeTheory.Auxiliary.Auxiliary.
 
-Set Automatic Introduction.
-
 Local Notation "[ C , D ]" := (functor_category C D).
 
 (** * Relative universe structures *)
@@ -72,11 +70,13 @@ Definition rel_universe_structure_prop (Y : rel_universe_structure_data)
 Definition weq_rel_universe_structure_ :
    rel_universe_structure ≃ ∑ Y : rel_universe_structure_data, rel_universe_structure_prop Y.
 Proof.
-  eapply weqcomp. Focus 2.
+  eapply weqcomp.
+  2: {
     set (XR:=@weqforalltototal (ob C)).
     specialize (XR (fun X => ∏ f : D⟦ J X, U⟧, fpullback_data f)). simpl in XR.
     specialize (XR (fun X pX => ∏ A, fpullback_prop  (pX  A))).
     apply XR.
+  }
   apply weqonsecfibers.
   intro X.
   apply weqforalltototal.
@@ -399,7 +399,7 @@ Definition rel_universe_fpullback_mor_id
   : rel_universe_fpullback_mor (identity X) e
   = identity (fpb_ob (U X f)).
 Proof.
-  refine (_ @ _). Focus 2. { apply fully_faithful_inv_identity. } Unfocus.
+  refine (_ @ _). 2: { apply fully_faithful_inv_identity. }
   apply (maponpaths (fully_faithful_inv_hom _ _ _)). 
   apply (map_into_Pb_unique _ (pr2 (pr2 (U _ _)))).
   - refine (_ @ _). { apply Pb_map_commutes_1. }
@@ -421,18 +421,18 @@ Definition rel_universe_fpullback_mor_comp
     = rel_universe_fpullback_mor g e
     ;; rel_universe_fpullback_mor g' e'.
 Proof.
-  refine (_ @ _). Focus 2. { apply fully_faithful_inv_comp. } Unfocus.
+  refine (_ @ _). 2: { apply fully_faithful_inv_comp. }
   apply (maponpaths (fully_faithful_inv_hom _ _ _)).
   apply (map_into_Pb_unique _ (pr2 (pr2 (U _ _)))).
   - refine (_ @ _). { apply Pb_map_commutes_1. }
-    refine (_ @ _). Focus 2.
-    { apply pathsinv0.
+    refine (_ @ _).
+    2: { apply pathsinv0.
       refine (_ @ _). { apply pathsinv0, assoc. } 
       refine (_ @ _). { apply maponpaths, Pb_map_commutes_1. }
       refine (_ @ _). { apply maponpaths, functor_comp. }
       refine (_ @ _). { apply assoc. }
       apply maponpaths_2, Pb_map_commutes_1.
-    } Unfocus.
+    }
     refine (_ @ _). { apply maponpaths, assoc. }
     apply functor_comp.
   - refine (_ @ _). { apply Pb_map_commutes_2. }
@@ -862,11 +862,11 @@ Proof.
       rewrite functor_comp.
       repeat rewrite assoc. apply maponpaths_2.
       apply pathsinv0. rewrite <- assoc. rewrite <- assoc.
-      apply (iso_inv_to_left D' _ _ _ (αpwiso Xf )).
+      apply (iso_inv_to_left (C:=D') _ _ _ (αpwiso Xf )).
       cbn. unfold precomp_with. rewrite id_right.
       assert (XR := nat_trans_ax α').
       apply pathsinv0. 
-      etrans. Focus 2. apply XR.
+      etrans. 2: { apply XR. }
       cbn.
       apply pathsinv0. 
       etrans. apply maponpaths_2. apply maponpaths. 
@@ -896,7 +896,7 @@ Proof.
       * cbn. unfold precomp_with. rewrite id_right. rewrite id_right.
         assert (XR := nat_trans_ax α').
         cbn in XR. 
-        etrans. Focus 2. apply assoc.
+        etrans. 2: { apply assoc. }
         rewrite <- XR.
         rewrite assoc.
         apply maponpaths_2.
@@ -969,6 +969,25 @@ Definition weq_weak_relative_universe_transfer
            (S_ff : fully_faithful S)
 : weak_relative_universe J ≃ weak_relative_universe J'
 := make_weq _ (isweq_weak_relative_universe_transfer R_full isD isD' T eta eps S_ff).
+
+Section Weak_RelU_Comm_Square.
+
+  Definition weak_relu_comm_square
+  : ∏ (u : relative_universe J),
+    weak_from_relative_universe J' (transfer_of_rel_univ_with_ess_surj _ u _ _ _ _ is_iso_α S_pb R_es C'_sat J'_ff S_full)
+    = weak_relative_universe_transfer (weak_from_relative_universe J u).
+  Proof.
+    intros u.
+    use total2_paths_f.
+    - apply idpath.
+    - apply proofirrelevance.
+      apply impred. intros c'.
+      apply impred. intros d'.
+      apply isapropishinh.
+  Defined.
+
+End Weak_RelU_Comm_Square.
+
 
 End Is_universe_relative_to_Transfer.
 
